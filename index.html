@@ -1330,10 +1330,23 @@ section[id]{scroll-margin-top:80px}
   const h1 = document.querySelector('.hero-h1');
   if (h1) {
     h1.classList.add('reveal-text');
+    // Apply gradient inline to the .accent span's chars so the lavender italic survives the split
+    const accentSpan = h1.querySelector('.accent');
+    const accentBg = accentSpan ? getComputedStyle(accentSpan).backgroundImage : null;
     h1.querySelectorAll('.black, .accent').forEach((span) => {
       const text = span.textContent;
       span.innerHTML = text.split('').map(c => `<span class="char">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
     });
+    if (accentBg && accentSpan) {
+      // Move gradient + text-fill onto each char so it survives
+      accentSpan.querySelectorAll('.char').forEach(c => {
+        c.style.backgroundImage = accentBg;
+        c.style.webkitBackgroundClip = 'text';
+        c.style.backgroundClip = 'text';
+        c.style.webkitTextFillColor = 'transparent';
+        c.style.color = 'transparent';
+      });
+    }
     // Stagger chars with progressive delay — 35ms per char
     const chars = h1.querySelectorAll('.char');
     chars.forEach((c, i) => {
