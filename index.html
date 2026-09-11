@@ -501,6 +501,71 @@ img{max-width:100%;display:block}
 }
 
 /* ========================================================
+   MOTION GRAPHICS LAYER
+   Pure CSS + tiny JS, all respect prefers-reduced-motion
+   ======================================================== */
+
+/* 1. Aurora backdrop — soft drifting color blobs */
+.aurora{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.aurora::before,.aurora::after{content:"";position:absolute;width:60vw;height:60vw;border-radius:50%;filter:blur(80px);opacity:0.35;animation:aurora-drift 18s ease-in-out infinite alternate}
+.aurora::before{background:radial-gradient(circle, #A78BFA 0%, transparent 70%);top:-20%;right:-10%;animation-delay:0s}
+.aurora::after{background:radial-gradient(circle, #F0ABFC 0%, transparent 70%);bottom:-20%;left:-10%;animation-delay:-9s}
+@keyframes aurora-drift{
+  0%{transform:translate(0,0) scale(1)}
+  100%{transform:translate(40px,-30px) scale(1.15)}
+}
+
+/* 2. Floating particles — slow upward drift, subtle */
+.particles{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.particle{position:absolute;width:6px;height:6px;border-radius:50%;background:radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(167,139,250,0.5) 60%, transparent 100%);box-shadow:0 0 10px rgba(167,139,250,0.6);animation:particle-float var(--dur, 16s) linear infinite;opacity:0}
+@keyframes particle-float{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  10%{opacity:var(--peak, 0.7)}
+  90%{opacity:var(--peak, 0.7)}
+  100%{transform:translateY(-110vh) translateX(var(--drift, 20px));opacity:0}
+}
+
+/* 3. Letter-by-letter headline reveal */
+.reveal-text .char{display:inline-block;opacity:0;transform:translateY(40px);transition:opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)}
+.reveal-text.in .char{opacity:1;transform:translateY(0)}
+
+/* 4. Scroll-pinned "marquee" feature strip — scrubbing word cloud */
+.scrub-strip{position:relative;height:140px;overflow:hidden;background:linear-gradient(180deg, #FAFBFF 0%, #FFFFFF 100%);border-top:1px solid var(--c-border);border-bottom:1px solid var(--c-border)}
+.scrub-track{display:flex;gap:var(--s-7);padding:30px 0;white-space:nowrap;font-size:48px;font-weight:800;letter-spacing:-0.03em;color:var(--c-text);will-change:transform}
+.scrub-track span{opacity:0.18;transition:opacity 0.3s ease;display:inline-flex;align-items:center;gap:24px}
+.scrub-track span.accent-word{background:linear-gradient(135deg,var(--c-accent),var(--c-accent-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-style:italic}
+.scrub-track span .dot{width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0}
+
+/* 5. Testimonial auto-rotate */
+.test-grid{position:relative;min-height:280px}
+.test-card{position:absolute;inset:0;opacity:0;transform:translateY(20px);transition:opacity 0.6s ease, transform 0.6s ease;pointer-events:none}
+.test-card.active{opacity:1;transform:translateY(0);pointer-events:auto;position:relative}
+
+/* 6. Cursor-follow orb on privacy section */
+.cursor-orb{position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle, rgba(167,139,250,0.25) 0%, rgba(167,139,250,0) 60%);pointer-events:none;transform:translate(-50%, -50%);transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);z-index:1}
+@media (hover:none){.cursor-orb{display:none}}
+
+/* 7. Stats counter — animates numbers when visible */
+.stat-num{font-variant-numeric:tabular-nums;transition:transform 0.4s cubic-bezier(0.16,1,0.3,1)}
+.stat-num.pulse{transform:scale(1.05)}
+
+/* 8. Reveal on scroll — fade up elements as they enter viewport */
+.reveal-up{opacity:0;transform:translateY(30px);transition:opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1)}
+.reveal-up.in{opacity:1;transform:translateY(0)}
+.reveal-up.d1{transition-delay:0.1s}
+.reveal-up.d2{transition-delay:0.2s}
+.reveal-up.d3{transition-delay:0.3s}
+.reveal-up.d4{transition-delay:0.4s}
+
+/* 9. Magnetic CTA hover */
+.magnetic-btn{transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);will-change:transform}
+
+/* 10. Aurora hero — lavender gradient sweep behind headline */
+.hero-gradient{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.hero-gradient::before{content:"";position:absolute;width:80vw;height:80vw;border-radius:50%;background:conic-gradient(from 0deg, #A78BFA, #F0ABFC, #C4B5FD, #DDD6FE, #A78BFA);filter:blur(100px);opacity:0.25;top:-30%;right:-30%;animation:hero-spin 30s linear infinite}
+@keyframes hero-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* ========================================================
    ORB HERO — DISABLED. Hero is now text-only per reference.
    CSS preserved here for future reuse if you want to bring
    the orb back as a separate visual element later.
@@ -709,6 +774,17 @@ section[id]{scroll-margin-top:80px}
 
 <!-- 01 HERO — text-first, left-aligned, no right panel -->
 <section class="hero" aria-labelledby="hero-h" id="top">
+  <!-- Animated backdrop -->
+  <div class="hero-gradient" aria-hidden="true"></div>
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="particles" aria-hidden="true">
+    <span class="particle" style="left:8%;bottom:-20px;--dur:22s;--drift:30px;--peak:0.5;animation-delay:-2s"></span>
+    <span class="particle" style="left:22%;bottom:-20px;--dur:18s;--drift:-20px;--peak:0.7;animation-delay:-7s"></span>
+    <span class="particle" style="left:42%;bottom:-20px;--dur:24s;--drift:40px;--peak:0.4;animation-delay:-12s"></span>
+    <span class="particle" style="left:65%;bottom:-20px;--dur:20s;--drift:-30px;--peak:0.6;animation-delay:-4s"></span>
+    <span class="particle" style="left:82%;bottom:-20px;--dur:26s;--drift:25px;--peak:0.5;animation-delay:-15s"></span>
+    <span class="particle" style="left:55%;bottom:-20px;--dur:19s;--drift:-15px;--peak:0.8;animation-delay:-9s"></span>
+  </div>
   <div class="container hero-inner">
     <div class="hero-text">
       <div class="hero-eyebrow">A CALMER MIND. A BRIGHTER YOU.</div>
@@ -740,31 +816,40 @@ section[id]{scroll-margin-top:80px}
   </div>
 </section>
 
-<!-- 02 FEATURE STRIP -->
-<section class="feat-strip" aria-label="Quick feature overview">
-  <div class="container">
-    <div class="feat-grid">
-      <div class="feat-item">
-        <div class="feat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
-        <h3 class="feat-item-h">AI-Powered Insights</h3>
-        <p class="feat-item-p">Get thoughtful, source-grounded interpretations</p>
-      </div>
-      <div class="feat-item">
-        <div class="feat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>
-        <h3 class="feat-item-h">Personal Journal</h3>
-        <p class="feat-item-p">Capture by text or voice in seconds</p>
-      </div>
-      <div class="feat-item">
-        <div class="feat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="11" y2="16"/><line x1="15.5" y1="7.5" x2="13" y2="16"/></svg></div>
-        <h3 class="feat-item-h">Your Dream World</h3>
-        <p class="feat-item-p">Track people, places, symbols and patterns</p>
-      </div>
-      <div class="feat-item">
-        <div class="feat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
-        <h3 class="feat-item-h">A More Intentional You</h3>
-        <p class="feat-item-p">Turn insights into real-life growth</p>
-      </div>
-    </div>
+<!-- 02 SCROLL-SCRUBBING MARQUEE — keyword cloud that scrubs past as you scroll -->
+<section class="scrub-strip" aria-label="Core capabilities marquee">
+  <div class="scrub-track" id="scrubTrack" aria-hidden="true">
+    <span>Capture <span class="dot"></span></span>
+    <span class="accent-word">Understand</span>
+    <span>your dreams</span>
+    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
+    <span>Local-first</span>
+    <span class="accent-word">Five schools</span>
+    <span>Voice &amp; text</span>
+    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
+    <span>Encrypted</span>
+    <span class="accent-word">Five lenses</span>
+    <span>Privacy</span>
+    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
+    <span>Patterns</span>
+    <span class="accent-word">Compounding</span>
+    <span>Personal</span>
+    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
+    <span>Capture <span class="dot"></span></span>
+    <span class="accent-word">Understand</span>
+    <span>your dreams</span>
+    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
+    <span>Local-first</span>
+    <span class="accent-word">Five schools</span>
+    <span>Voice &amp; text</span>
+    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
+    <span>Encrypted</span>
+    <span class="accent-word">Five lenses</span>
+    <span>Privacy</span>
+    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
+    <span>Patterns</span>
+    <span class="accent-word">Compounding</span>
+    <span>Personal</span>
   </div>
 </section>
 
@@ -973,6 +1058,7 @@ section[id]{scroll-margin-top:80px}
 
 <!-- 09 PRIVACY -->
 <section class="sec privacy" aria-labelledby="privacy-h">
+  <div class="cursor-orb" id="cursorOrb" aria-hidden="true"></div>
   <div class="container">
     <div class="kicker" style="color:#A78BFA">LOCAL-FIRST, NOT CLOUDLESS</div>
     <h2 class="sec-head" id="privacy-h" style="color:#fff">Your dreams stay yours. <span class="accent" style="font-style:italic">By default.</span></h2>
@@ -1216,43 +1302,133 @@ section[id]{scroll-margin-top:80px}
 </footer>
 
 <script>
-/* Scroll-driven orb dissolve — DISABLED (orb removed from hero)
+/* ============================================================
+   MOTION ENGINE — pure JS, prefers-reduced-motion aware
+   ============================================================ */
 (function(){
-  const brain = document.getElementById('orbStage');
-  const phones = document.getElementById('phoneCluster');
-  if (!brain || !phones) return;
-  // ...
-})();
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) return;
 
-/* Subtle card reveal on scroll */
-(function(){
-  if (!matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.style.opacity = '1';
-        e.target.style.transform = 'translateY(0)';
-        io.unobserve(e.target);
-      }
+  /* 1. HERO HEADLINE — split into chars for stagger reveal */
+  const h1 = document.querySelector('.hero-h1');
+  if (h1) {
+    h1.classList.add('reveal-text');
+    h1.querySelectorAll('.black, .accent').forEach((span, sIdx) => {
+      const text = span.innerText;
+      span.innerHTML = text.split('').map(c => `<span class="char">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -8% 0px' });
+    setTimeout(() => h1.classList.add('in'), 250);
+  }
 
-  document.querySelectorAll('.tab-card, .feat-card, .school-card, .test-card, .step, .priv-card').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition = 'opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)';
-    io.observe(el);
-  });
-})();
+  /* 2. SCRUB MARQUEE — track slides horizontally as user scrolls */
+  const scrub = document.getElementById('scrubTrack');
+  if (scrub) {
+    function updateScrub(){
+      const r = scrub.parentElement.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // Map scroll progress through the strip to translateX
+      const total = scrub.parentElement.offsetHeight + vh;
+      const scrolled = Math.min(Math.max(-r.top + vh * 0.5, 0), total);
+      const t = scrolled / total;
+      const x = -t * (scrub.scrollWidth / 2);
+      scrub.style.transform = `translateX(${x}px)`;
+      // Highlight words near the center
+      const spans = scrub.querySelectorAll('span');
+      const center = window.innerWidth / 2;
+      spans.forEach(s => {
+        const sr = s.getBoundingClientRect();
+        const dist = Math.abs((sr.left + sr.width/2) - center);
+        const opacity = Math.max(0.18, 1 - dist / 400);
+        s.style.opacity = Math.min(1, opacity);
+      });
+    }
+    window.addEventListener('scroll', updateScrub, { passive: true });
+    updateScrub();
+  }
 
-/* Respect prefers-reduced-motion globally */
-(function(){
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.querySelectorAll('*').forEach(el => {
-      el.style.animation = 'none';
-      el.style.transition = 'none';
+  /* 3. TESTIMONIAL AUTO-ROTATOR */
+  const cards = document.querySelectorAll('.test-card');
+  if (cards.length > 1) {
+    let idx = 0;
+    cards[0].classList.add('active');
+    setInterval(() => {
+      cards[idx].classList.remove('active');
+      idx = (idx + 1) % cards.length;
+      cards[idx].classList.add('active');
+    }, 5000);
+  } else if (cards.length === 1) {
+    cards[0].classList.add('active');
+  }
+
+  /* 4. CURSOR-FOLLOW ORB in privacy section */
+  const privacySection = document.querySelector('.privacy');
+  const orb = document.getElementById('cursorOrb');
+  if (privacySection && orb) {
+    privacySection.style.position = 'relative';
+    privacySection.style.overflow = 'hidden';
+    privacySection.addEventListener('mousemove', (e) => {
+      const r = privacySection.getBoundingClientRect();
+      orb.style.transform = `translate(${e.clientX - r.left}px, ${e.clientY - r.top}px) translate(-50%, -50%)`;
+    });
+    privacySection.addEventListener('mouseleave', () => {
+      orb.style.transform = 'translate(-50%, -50%) translate(-200px, -200px)';
+      orb.style.opacity = '0';
+    });
+    privacySection.addEventListener('mouseenter', () => {
+      orb.style.opacity = '1';
     });
   }
+
+  /* 5. SCROLL REVEAL — fade up anything with .reveal-up */
+  const revealIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        revealIO.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+
+  document.querySelectorAll('.sec-head, .sec-sub, .kicker, .hero-eyebrow, .hero-ctas, .hero-trust, .tab-card, .feat-card, .school-card, .step, .priv-card, .price-card, .faq-item, .mission-h, .mission-p, .testimonials-head, .final-ctas').forEach(el => {
+    if (!el.classList.contains('reveal-up')) el.classList.add('reveal-up');
+    revealIO.observe(el);
+  });
+
+  /* 6. MAGNETIC CTA — buttons nudge toward cursor on hover */
+  document.querySelectorAll('.btn, .price-cta, .hdr-cta').forEach(btn => {
+    btn.classList.add('magnetic-btn');
+    btn.addEventListener('mousemove', (e) => {
+      const r = btn.getBoundingClientRect();
+      const x = (e.clientX - r.left - r.width / 2) * 0.2;
+      const y = (e.clientY - r.top - r.height / 2) * 0.2;
+      btn.style.transform = `translate(${x}px, ${y}px)`;
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = '';
+    });
+  });
+
+  /* 7. PARALLAX on aurora — drifts faster than scroll */
+  const aurora = document.querySelector('.aurora');
+  if (aurora) {
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      aurora.style.transform = `translateY(${y * 0.15}px)`;
+    }, { passive: true });
+  }
+
+  /* 8. STAT NUMBER PULSE — when section scrolls into view */
+  const statNums = document.querySelectorAll('.stat-num');
+  const statIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('pulse');
+        setTimeout(() => e.target.classList.remove('pulse'), 600);
+        statIO.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  statNums.forEach(s => statIO.observe(s));
 })();
 </script>
 
