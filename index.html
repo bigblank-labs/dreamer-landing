@@ -1297,40 +1297,35 @@ section[id]{scroll-margin-top:80px}
   const phones = document.getElementById('phoneCluster');
   if (!brain || !phones) return;
 
-  // Wait for layout/fonts before measuring
-  function rafReady(){return new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));}
+  // Always start fresh: no dissolve, no phones.
+  brain.classList.remove('dissolve');
+  phones.classList.remove('active');
   let triggered = false;
   let armed = false;
   function update(){
     const rect = brain.getBoundingClientRect();
     const vh = window.innerHeight;
-    // The brain is "in play" only while its top is still reasonably in the upper viewport.
-    // Compute progress of the brain's top moving from vh*0.4 down to 0.
+    // Brain is "below trigger" when its top is still more than 40% of viewport down.
+    // In that case the brain is fully on screen — clear dissolve + phones.
     const startTop = vh * 0.4;
     if (rect.top > startTop) {
-      // Brain is below the trigger — fully visible, not dissolved
       brain.classList.remove('dissolve');
       phones.classList.remove('active');
       armed = true;
       triggered = false;
       return;
     }
-    if (!armed) return; // don't fire on first load if scroll position is mid-page
-    // Progress from 0 (just entered trigger) to 1 (top at 0)
+    if (!armed) return;
     const t = 1 - Math.max(0, rect.top) / startTop;
     if (t > 0.05) brain.classList.add('dissolve');
     else brain.classList.remove('dissolve');
-    if (t > 0.3 && !triggered) {
-      phones.classList.add('active');
-      triggered = true;
-    }
+    if (t > 0.3 && !triggered) { phones.classList.add('active'); triggered = true; }
   }
-  // Arm after first user scroll OR after 1.5s of being at top — whichever comes first
-  let armedTimer = setTimeout(()=>{ armed = true; update(); }, 1500);
+  // Arm on first user scroll OR after 1500ms idle at top
+  let armedTimer = setTimeout(()=>{ armed = true; }, 1500);
   function onFirstScroll(){ armed = true; clearTimeout(armedTimer); window.removeEventListener('scroll', onFirstScroll); update(); }
   window.addEventListener('scroll', onFirstScroll, { passive: true, once: true });
   window.addEventListener('scroll', update, { passive: true });
-  update();
 })();
 
 /* Subtle card reveal on scroll */
