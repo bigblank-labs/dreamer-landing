@@ -1297,16 +1297,38 @@ section[id]{scroll-margin-top:80px}
   const phones = document.getElementById('phoneCluster');
   if (!brain || !phones) return;
 
+  // Wait for layout/fonts before measuring
+  function rafReady(){return new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));}
   let triggered = false;
+  let armed = false;
   function update(){
     const rect = brain.getBoundingClientRect();
     const vh = window.innerHeight;
-    const t = Math.min(1, Math.max(0, (vh - rect.top - vh*0.4) / (vh*0.4)));
-    if (t > 0.1) brain.classList.add('dissolve');
+    // The brain is "in play" only while its top is still reasonably in the upper viewport.
+    // Compute progress of the brain's top moving from vh*0.4 down to 0.
+    const startTop = vh * 0.4;
+    if (rect.top > startTop) {
+      // Brain is below the trigger — fully visible, not dissolved
+      brain.classList.remove('dissolve');
+      phones.classList.remove('active');
+      armed = true;
+      triggered = false;
+      return;
+    }
+    if (!armed) return; // don't fire on first load if scroll position is mid-page
+    // Progress from 0 (just entered trigger) to 1 (top at 0)
+    const t = 1 - Math.max(0, rect.top) / startTop;
+    if (t > 0.05) brain.classList.add('dissolve');
     else brain.classList.remove('dissolve');
-    if (t > 0.35 && !triggered) { phones.classList.add('active'); triggered = true; }
-    else if (t < 0.15 && triggered) { phones.classList.remove('active'); triggered = false; }
+    if (t > 0.3 && !triggered) {
+      phones.classList.add('active');
+      triggered = true;
+    }
   }
+  // Arm after first user scroll OR after 1.5s of being at top — whichever comes first
+  let armedTimer = setTimeout(()=>{ armed = true; update(); }, 1500);
+  function onFirstScroll(){ armed = true; clearTimeout(armedTimer); window.removeEventListener('scroll', onFirstScroll); update(); }
+  window.addEventListener('scroll', onFirstScroll, { passive: true, once: true });
   window.addEventListener('scroll', update, { passive: true });
   update();
 })();
