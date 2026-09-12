@@ -1743,10 +1743,10 @@ section[id]{scroll-margin-top:80px}
       p.push();
       p.translate(l.x, l.y, l.z);
 
-      // Use emissive material with slight pink base — combines with lights for color
+      // Translucent material — let the colored lights shine through
       p.specularMaterial(255, 220, 235);
-      p.shininess(35);
-      p.fill(255, 220, 235, 215);
+      p.shininess(25);
+      p.fill(255, 200, 220, 110);  // very low alpha so colored lights dominate
 
       p.sphere(l.r, 32, 32);
       p.pop();
@@ -1760,33 +1760,35 @@ section[id]{scroll-margin-top:80px}
 
       p.background(217, 217, 220);
 
-      // World-space lighting — applies to all lobes
-      p.ambientLight(140, 140, 170);
-      // Pink light from top-left
-      p.pointLight(255, 130, 180, -500, -400, 200);
-      // Cyan/blue light from bottom-right
-      p.pointLight(120, 200, 255, 500, 400, 100);
+      // Low ambient — let colored point lights dominate
+      p.ambientLight(80, 80, 100);
+      // Strong pink light from top-left
+      p.pointLight(255, 100, 160, -400, -400, 150);
+      // Strong cyan/blue light from bottom-right
+      p.pointLight(100, 180, 255, 500, 400, 100);
       // Peach/cream light from top-center
-      p.pointLight(255, 220, 180, 0, -600, 250);
+      p.pointLight(255, 200, 140, 0, -600, 200);
       // Lavender from bottom
-      p.pointLight(220, 180, 255, 0, 600, 100);
-      // White specular key
-      p.pointLight(255, 255, 255, 0, 0, 800);
+      p.pointLight(200, 160, 255, 0, 600, 100);
+      // Yellow tint from side
+      p.pointLight(255, 230, 150, -500, 0, 200);
+      // Soft white fill
+      p.pointLight(180, 180, 200, 0, 0, 600);
 
       p.push();
       p.rotateY(dragX);
       p.rotateX(dragY);
       p.scale(1 + breath);
 
-      // Render all brain lobes — world lights above illuminate them all
+      // Render all brain lobes — colored lights above illuminate them all
       for (let i = 0; i < lobes.length; i++) {
         drawLobe(lobes[i]);
       }
 
-      // Stem (lavender tinted)
-      p.specularMaterial(255, 220, 240);
-      p.shininess(35);
-      p.fill(225, 210, 240, 200);
+      // Stem — slightly more lavender tint
+      p.specularMaterial(255, 200, 235);
+      p.shininess(25);
+      p.fill(220, 190, 230, 110);
       for (const s of stem) {
         p.push();
         p.translate(s.x, s.y, s.z);
@@ -1794,10 +1796,10 @@ section[id]{scroll-margin-top:80px}
         p.pop();
       }
 
-      // Soft specular highlights on top-left lobes
+      // Subtle white specular highlights on top-left lobes
       p.specularMaterial(255, 255, 255);
       p.shininess(80);
-      p.fill(255, 255, 255, 200);
+      p.fill(255, 255, 255, 140);
       for (let i = 0; i < 3; i++) {
         const l = lobes[i];
         p.push();
