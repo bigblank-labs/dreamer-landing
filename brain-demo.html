@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Iridescent Brain · p5.js</title>
+<title>Dreamer Brain</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js"></script>
 <style>
   html, body { margin: 0; padding: 0; overflow: hidden; background: #d9d9dc; }
@@ -12,49 +12,44 @@
 </head>
 <body>
 <script>
-// Iridescent brain — many overlapping translucent spheres + point lights for the soap-film hue shift
 const sketch = (p) => {
-  // Lobe positions (x,y,z) + radius — roughly a brain shape
+  // Lobe positions — 10 spheres arranged as a brain
   const lobes = [
-    { x: -110, y:  -90, z:  40, r:  90 },
-    { x:  110, y:  -90, z:  40, r:  95 },
-    { x: -130, y:   20, z:  30, r: 100 },
-    { x:  130, y:   20, z:  30, r: 105 },
-    { x:  -80, y:  120, z: -20, r:  85 },
-    { x:   90, y:  120, z: -20, r:  90 },
-    { x:    0, y: -130, z:  20, r:  80 },
-    { x:    0, y:  -40, z: -80, r:  85 },
-    { x:  -50, y: -150, z: -10, r:  55 },
-    { x:   55, y: -150, z: -10, r:  55 },
+    { x: -115, y:  -85, z:  40, r:  92 },
+    { x:  115, y:  -85, z:  40, r:  95 },
+    { x: -135, y:   25, z:  30, r: 100 },
+    { x:  135, y:   25, z:  30, r: 108 },
+    { x:  -85, y:  120, z: -25, r:  88 },
+    { x:   95, y:  120, z: -25, r:  92 },
+    { x:    0, y: -135, z:  15, r:  85 },
+    { x:    0, y:  -45, z: -85, r:  88 },
+    { x:  -55, y: -155, z: -15, r:  58 },
+    { x:   55, y: -155, z: -15, r:  58 },
   ];
-  // Brain stem — extends down from the back
+  // Brain stem (3 lobes extending down/back)
   const stem = [
-    { x:   0, y: 200, z: -40, r: 50 },
-    { x:   0, y: 270, z: -60, r: 35 },
-    { x:   0, y: 320, z: -80, r: 25 },
+    { x: 0, y: 195, z: -45, r: 50 },
+    { x: 0, y: 260, z: -65, r: 35 },
+    { x: 0, y: 310, z: -85, r: 24 },
   ];
 
-  let dragX = 0, dragY = -0.1, targetX = 0, targetY = -0.1;
+  let dragX = 0, dragY = -0.08;
+  let targetX = 0, targetY = -0.08;
 
   p.setup = function() {
     p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
     p.perspective(p.PI / 3.2, p.width / p.height, 1, 5000);
     p.noStroke();
-    // Smooth anti-aliased spheres
-    p.smooth();
   };
-
   p.windowResized = function() { p.resizeCanvas(p.windowWidth, p.windowHeight); };
 
   p.draw = function() {
-    // Smooth drag
     dragX += (targetX - dragX) * 0.06;
     dragY += (targetY - dragY) * 0.06;
-    // Subtle auto-breathing
     const t = p.millis() / 1000;
-    const breath = Math.sin(t * 0.6) * 0.012;
+    const breath = Math.sin(t * 0.55) * 0.015;
 
-    p.background(217, 217, 220); // #d9d9dc pale grey
+    p.background(217, 217, 220);
 
     p.push();
     p.translate(0, 0, 0);
@@ -62,20 +57,20 @@ const sketch = (p) => {
     p.rotateX(dragY);
     p.scale(1 + breath);
 
-    // Lighting setup — 3 colored point lights + ambient
-    p.ambientLight(180, 180, 200);
-    p.pointLight(255, 220, 230, -300, -200, 200);   // pink top-left
-    p.pointLight(180, 220, 255, 300, 100, 200);    // blue bottom-right
-    p.pointLight(255, 235, 200, 0, -400, 100);     // peach top
-    p.pointLight(220, 200, 255, -200, 300, 100);   // lavender bottom-left
-    p.pointLight(255, 255, 255, 0, 0, 600);         // key light from front
+    // 5 colored lights for iridescent feel
+    p.ambientLight(190, 190, 210);
+    p.pointLight(255, 220, 235, -400, -300, 250);   // pink top-left
+    p.pointLight(180, 220, 255,  400,  200, 200);   // cyan-blue bottom-right
+    p.pointLight(255, 235, 195,    0, -500, 150);   // peach top
+    p.pointLight(225, 200, 255,  -350,  400, 100);   // lavender bottom-left
+    p.pointLight(255, 255, 255,    0,    0, 700);   // white key
 
-    // Material — iridescent-like via low specular
+    // Translucent material
     p.specularMaterial(255);
-    p.shininess(80);
+    p.shininess(60);
 
-    // Render brain lobes with translucent fill
-    p.fill(255, 230, 240, 220);
+    // Brain lobes
+    p.fill(255, 230, 240, 200);
     for (const l of lobes) {
       p.push();
       p.translate(l.x, l.y, l.z);
@@ -83,8 +78,8 @@ const sketch = (p) => {
       p.pop();
     }
 
-    // Render brain stem
-    p.fill(220, 220, 255, 200);
+    // Brain stem
+    p.fill(225, 220, 255, 200);
     for (const s of stem) {
       p.push();
       p.translate(s.x, s.y, s.z);
@@ -92,12 +87,13 @@ const sketch = (p) => {
       p.pop();
     }
 
-    // Specular overlay — small bright highlight spheres
-    p.emissiveMaterial(255, 255, 255);
-    for (const l of lobes.slice(0, 3)) {
+    // White specular highlights — three small bright dots on the upper-left
+    p.emissiveMaterial(255, 250, 255);
+    for (let i = 0; i < 3; i++) {
+      const l = lobes[i];
       p.push();
-      p.translate(l.x * 0.6, l.y * 0.6 - 20, l.z + 60);
-      p.sphere(l.r * 0.18, 16, 16);
+      p.translate(l.x * 0.55, l.y * 0.55 - 25, l.z + 55);
+      p.sphere(l.r * 0.16, 16, 16);
       p.pop();
     }
 
@@ -109,7 +105,6 @@ const sketch = (p) => {
     targetY += p.movedY * 0.005;
     targetY = p.constrain(targetY, -0.8, 0.8);
   };
-
   p.touchMoved = function() {
     if (p.touches.length === 1) {
       targetX += p.movedX * 0.005;
