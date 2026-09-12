@@ -1738,23 +1738,15 @@ section[id]{scroll-margin-top:80px}
       if (w && h) p.resizeCanvas(w, h);
     };
 
-    // Helper: render a single lobe with its own colored lights for the iridescent gradient
-    function drawLobe(l, idx) {
+    // Helper: render a single lobe
+    function drawLobe(l) {
       p.push();
       p.translate(l.x, l.y, l.z);
 
-      // Each lobe gets slightly different light positions for variation
-      const ox = Math.sin(idx) * 100;
-      const oy = Math.cos(idx) * 80;
-
-      p.ambientLight(255, 240, 245);
-      p.pointLight(255, 180, 210, l.x - 200 + ox, l.y - 200, 200);   // pink
-      p.pointLight(180, 200, 255, l.x + 200, l.y + 100, 150);       // cyan
-      p.pointLight(255, 220, 180, l.x, l.y - 250, 250);              // peach
-
-      p.specularMaterial(255, 230, 240);
-      p.shininess(40);
-      p.fill(255, 230, 240, 210);
+      // Use emissive material with slight pink base — combines with lights for color
+      p.specularMaterial(255, 220, 235);
+      p.shininess(35);
+      p.fill(255, 220, 235, 215);
 
       p.sphere(l.r, 32, 32);
       p.pop();
@@ -1768,23 +1760,33 @@ section[id]{scroll-margin-top:80px}
 
       p.background(217, 217, 220);
 
+      // World-space lighting — applies to all lobes
+      p.ambientLight(140, 140, 170);
+      // Pink light from top-left
+      p.pointLight(255, 130, 180, -500, -400, 200);
+      // Cyan/blue light from bottom-right
+      p.pointLight(120, 200, 255, 500, 400, 100);
+      // Peach/cream light from top-center
+      p.pointLight(255, 220, 180, 0, -600, 250);
+      // Lavender from bottom
+      p.pointLight(220, 180, 255, 0, 600, 100);
+      // White specular key
+      p.pointLight(255, 255, 255, 0, 0, 800);
+
       p.push();
       p.rotateY(dragX);
       p.rotateX(dragY);
       p.scale(1 + breath);
 
-      // Render all brain lobes with per-lobe lighting
+      // Render all brain lobes — world lights above illuminate them all
       for (let i = 0; i < lobes.length; i++) {
-        drawLobe(lobes[i], i);
+        drawLobe(lobes[i]);
       }
 
-      // Stem
-      p.ambientLight(220, 215, 245);
-      p.pointLight(220, 200, 255, 0, 300, 200);
-      p.pointLight(255, 200, 220, 200, 200, 200);
+      // Stem (lavender tinted)
       p.specularMaterial(255, 220, 240);
-      p.shininess(40);
-      p.fill(225, 215, 245, 200);
+      p.shininess(35);
+      p.fill(225, 210, 240, 200);
       for (const s of stem) {
         p.push();
         p.translate(s.x, s.y, s.z);
@@ -1795,7 +1797,7 @@ section[id]{scroll-margin-top:80px}
       // Soft specular highlights on top-left lobes
       p.specularMaterial(255, 255, 255);
       p.shininess(80);
-      p.fill(255, 255, 255, 180);
+      p.fill(255, 255, 255, 200);
       for (let i = 0; i < 3; i++) {
         const l = lobes[i];
         p.push();
