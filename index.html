@@ -741,6 +741,30 @@ img{max-width:100%;display:block}
 
 
 /* ========================================================
+   3D BRAIN EMBED — p5.js WebGL iframe
+   ======================================================== */
+.brain-frame{
+  position:relative;
+  width:100%;
+  height:520px;
+  border-radius:32px;
+  overflow:hidden;
+  background:#d9d9dc;
+}
+.brain-frame iframe{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:0;
+  display:block;
+  pointer-events:auto;
+}
+@media(max-width:860px){
+  .brain-frame{height:400px;order:-1;margin-bottom:var(--s-6);border-radius:20px}
+}
+
+/* ========================================================
    APP SHOWCASE — 5-phone cloud cluster from reference image
    ======================================================== */
 .showcase-section{
@@ -1023,16 +1047,9 @@ section[id]{scroll-margin-top:80px}
       </div>
     </div>
 
-    <!-- Iridescent orb — right side, static decoration (still motion) -->
-    <div class="orb-hero" aria-hidden="true">
-      <div class="orb-stage">
-        <div class="orb-aura"></div>
-        <div class="orb"></div>
-        <div class="orb-shimmer"></div>
-        <div class="orb-highlight"></div>
-        <div class="orb-dot pink"></div>
-        <div class="orb-dot cyan"></div>
-      </div>
+    <!-- 3D Iridescent Brain — p5.js WebGL (drag to rotate) -->
+    <div class="brain-frame" aria-label="Interactive 3D brain illustration — drag to rotate">
+      <iframe src="brain-demo.html" title="Iridescent translucent brain" loading="lazy" tabindex="-1"></iframe>
     </div>
   </div>
 </section>
