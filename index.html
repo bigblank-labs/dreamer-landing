@@ -575,34 +575,100 @@ img{max-width:100%;display:block}
 .hero-gradient,.aurora,.particles{z-index:1}
 
 /* ========================================================
-   FLOATING BRAIN ORB ICON — persistent bottom-right bubble.
-   Replaces the old hero orb as a passive decorative element.
+   PHONE EXAMPLES SECTION — three brand-matched UI states
+   ======================================================== */
+.phones-section{padding:var(--s-9) 0;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFF 100%)}
+.phones-head{text-align:center;margin-bottom:var(--s-7);max-width:720px;margin-left:auto;margin-right:auto}
+.phones-head .kicker{justify-content:center;margin-bottom:var(--s-3)}
+.phones-head .sec-head{margin-left:auto;margin-right:auto}
+.phones-head .sec-sub{margin-left:auto;margin-right:auto}
+
+.phones-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-5);max-width:1100px;margin:0 auto}
+@media(max-width:860px){.phones-grid{grid-template-columns:1fr;max-width:340px}}
+
+.phone-card{display:flex;flex-direction:column;gap:var(--s-3)}
+.phone-mock{
+  width:100%;
+  aspect-ratio:9/19;
+  border-radius:32px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 30px 60px rgba(167,139,250,0.18),0 12px 24px rgba(11,11,12,0.06);
+  padding:18px 16px;
+  display:flex;
+  flex-direction:column;
+}
+.phone-mock::before{content:"";position:absolute;top:14px;left:50%;transform:translateX(-50%);width:60px;height:18px;background:rgba(0,0,0,0.5);border-radius:10px;z-index:5}
+
+/* Phone 1 — lavender/blue gradient (capture feeling) */
+.phone-mock.lavender-grad{background:linear-gradient(165deg,#A78BFA 0%,#7C3AED 35%,#5B6CFF 70%,#93C5FD 100%);color:#fff}
+.phone-mock.lavender-grad .phone-eyebrow{font-size:11px;opacity:0.85;margin-bottom:14px}
+.phone-heart-tile{background:rgba(255,255,255,0.12);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.25);border-radius:18px;padding:24px 16px;text-align:center;margin-bottom:18px;position:relative;overflow:hidden}
+.phone-heart-tile::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.18),rgba(255,255,255,0));border-radius:18px}
+.phone-heart{font-size:32px;color:#fff;margin-bottom:8px;text-shadow:0 2px 8px rgba(255,107,107,0.5)}
+.phone-reveal{font-size:18px;font-weight:600;line-height:1.3;letter-spacing:-0.01em}
+.phone-reveal.big{font-size:32px;font-weight:700;line-height:1.15}
+.phone-pill-btn{background:#fff;color:#7C3AED;border:0;border-radius:999px;padding:11px 28px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:14px;width:100%}
+.phone-pill-btn.dark{background:#0B0B0C;color:#fff}
+.phone-foot{font-size:9px;opacity:0.65;text-align:center;line-height:1.4;margin-top:auto}
+
+/* Phone 2 — clean white (add hints) */
+.phone-mock.white-grad{background:#fff;color:var(--c-text);border:1px solid var(--c-border)}
+.phone-back{font-size:20px;color:var(--c-muted);margin-bottom:18px}
+.phone-h3{font-size:18px;font-weight:700;letter-spacing:-0.01em;margin-bottom:8px}
+.phone-p{font-size:11px;color:var(--c-muted);line-height:1.5;margin-bottom:18px}
+.phone-options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:auto}
+.phone-opt{border:1px solid var(--c-border);border-radius:14px;padding:14px 8px;text-align:center;font-size:10px;font-weight:600;color:var(--c-muted);background:#fff}
+.phone-opt.selected{border-color:var(--c-text);background:linear-gradient(135deg,#A78BFA,#7C3AED);color:#fff}
+
+/* Phone 3 — pink/coral reveal */
+.phone-mock.pink-grad{background:linear-gradient(165deg,#FFB59A 0%,#F472B6 50%,#A78BFA 100%);color:#fff}
+.phone-pink-heart{display:flex;justify-content:center;color:#fff;margin-bottom:18px;filter:drop-shadow(0 8px 20px rgba(255,255,255,0.3))}
+.phone-mock.pink-grad .phone-reveal{font-size:30px;font-weight:700;text-align:center;line-height:1.15;letter-spacing:-0.015em}
+.phone-mock.center .phone-body{align-items:center;justify-content:center}
+
+/* Status bar */
+.phone-status{display:flex;justify-content:space-between;font-size:10px;font-weight:600;opacity:0.7;margin-bottom:8px;padding:0 4px;position:relative;z-index:2}
+.phone-body{flex:1;display:flex;flex-direction:column;padding:18px 4px 8px;position:relative;z-index:2}
+
+/* Phone caption */
+.phone-caption{font-size:13px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--c-muted);text-align:center;padding:var(--s-3) 0}
+
+/* ========================================================
+   FLOATING BRAIN ICON — bottom-right, pulsing, real brain ref.
    ======================================================== */
 .float-brain{
   position:fixed;
   bottom:24px;
   right:24px;
-  width:64px;
-  height:64px;
+  width:88px;
+  height:88px;
   z-index:90;
   cursor:pointer;
-  transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  border-radius:50%;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 12px 36px rgba(167,139,250,0.45), 0 0 0 4px rgba(167,139,250,0.18);
+  transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease;
   animation:float-brain-breathe 4.5s ease-in-out infinite, float-brain-float 6s ease-in-out infinite;
 }
-.float-brain:hover{transform:scale(1.1)}
-.float-brain svg{width:100%;height:100%;overflow:visible}
+.float-brain:hover{
+  transform:scale(1.08);
+  box-shadow:0 16px 48px rgba(167,139,250,0.65), 0 0 0 6px rgba(167,139,250,0.25);
+}
+.float-brain img{width:100%;height:100%;object-fit:cover;display:block}
 @keyframes float-brain-breathe{
-  0%,100%{filter:drop-shadow(0 8px 24px rgba(167,139,250,0.45))}
-  50%{filter:drop-shadow(0 12px 36px rgba(167,139,250,0.7))}
+  0%,100%{filter:brightness(1) saturate(1)}
+  50%{filter:brightness(1.1) saturate(1.15)}
 }
 @keyframes float-brain-float{
   0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-6px)}
+  50%{transform:translateY(-8px)}
 }
 .float-brain::after{
   content:"Tap to return to top";
   position:absolute;
-  right:74px;
+  right:98px;
   top:50%;
   transform:translateY(-50%);
   background:#0B0B0C;
@@ -618,7 +684,7 @@ img{max-width:100%;display:block}
 }
 .float-brain:hover::after{opacity:1;transform:translateY(-50%) translateX(-4px)}
 @media(max-width:560px){
-  .float-brain{width:52px;height:52px;bottom:80px;right:16px}
+  .float-brain{width:64px;height:64px;bottom:80px;right:16px}
   .float-brain::after{display:none}
 }
 .float-brain{transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease}
@@ -879,40 +945,60 @@ section[id]{scroll-margin-top:80px}
   </div>
 </section>
 
-<!-- 02 SCROLL-SCRUBBING MARQUEE — keyword cloud that scrubs past as you scroll -->
-<section class="scrub-strip" aria-label="Core capabilities marquee">
-  <div class="scrub-track" id="scrubTrack" aria-hidden="true">
-    <span>Capture <span class="dot"></span></span>
-    <span class="accent-word">Understand</span>
-    <span>your dreams</span>
-    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
-    <span>Local-first</span>
-    <span class="accent-word">Five schools</span>
-    <span>Voice &amp; text</span>
-    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
-    <span>Encrypted</span>
-    <span class="accent-word">Five lenses</span>
-    <span>Privacy</span>
-    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
-    <span>Patterns</span>
-    <span class="accent-word">Compounding</span>
-    <span>Personal</span>
-    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
-    <span>Capture <span class="dot"></span></span>
-    <span class="accent-word">Understand</span>
-    <span>your dreams</span>
-    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
-    <span>Local-first</span>
-    <span class="accent-word">Five schools</span>
-    <span>Voice &amp; text</span>
-    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
-    <span>Encrypted</span>
-    <span class="accent-word">Five lenses</span>
-    <span>Privacy</span>
-    <span class="dot" style="width:14px;height:14px;border-radius:50%;background:var(--c-accent);display:inline-block;flex-shrink:0"></span>
-    <span>Patterns</span>
-    <span class="accent-word">Compounding</span>
-    <span>Personal</span>
+<!-- 02 PHONE EXAMPLES — brand-matched UI states (lavender/violet gradient) -->
+<section class="phones-section" aria-labelledby="phones-h">
+  <div class="container">
+    <div class="phones-head">
+      <div class="kicker">SEE IT IN ACTION</div>
+      <h2 class="sec-head" id="phones-h">Built around the moments that matter.</h2>
+      <p class="sec-sub">Three screens from the app. Capture fast. Structure with care. Discover what your dreams are telling you.</p>
+    </div>
+    <div class="phones-grid">
+      <article class="phone-card">
+        <div class="phone-mock lavender-grad">
+          <div class="phone-status"><span>9:41</span><span>📶</span></div>
+          <div class="phone-body">
+            <div class="phone-eyebrow">Try to guess your secret sender</div>
+            <div class="phone-heart-tile">
+              <div class="phone-heart">♥</div>
+              <div class="phone-reveal">I love you,<br>Marie Claire</div>
+            </div>
+            <button class="phone-pill-btn">Respond</button>
+            <div class="phone-foot">You'll know who this is after they say hi to you</div>
+          </div>
+        </div>
+        <div class="phone-caption">Step 01 · Capture a feeling</div>
+      </article>
+      <article class="phone-card">
+        <div class="phone-mock white-grad">
+          <div class="phone-status"><span>9:42</span><span>📶</span></div>
+          <div class="phone-body">
+            <div class="phone-back">←</div>
+            <div class="phone-h3">Add one or more hints</div>
+            <div class="phone-p">It's body cues. And their mood. Write your hint. Hit the love button.</div>
+            <div class="phone-options">
+              <div class="phone-opt">Photo</div>
+              <div class="phone-opt selected">Audio</div>
+              <div class="phone-opt">Text</div>
+            </div>
+            <button class="phone-pill-btn dark">Continue</button>
+          </div>
+        </div>
+        <div class="phone-caption">Step 02 · AI structures, you decide</div>
+      </article>
+      <article class="phone-card">
+        <div class="phone-mock pink-grad">
+          <div class="phone-status"><span>9:43</span><span>📶</span></div>
+          <div class="phone-body center">
+            <div class="phone-pink-heart">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="56" height="56"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="phone-reveal big">I love you,<br>Marie Claire</div>
+          </div>
+        </div>
+        <div class="phone-caption">Step 03 · Your world reveals</div>
+      </article>
+    </div>
   </div>
 </section>
 
@@ -1421,31 +1507,7 @@ section[id]{scroll-margin-top:80px}
     setTimeout(() => h1.classList.add('in'), 100);
   }
 
-  /* 2. SCRUB MARQUEE — track slides horizontally as user scrolls */
-  const scrub = document.getElementById('scrubTrack');
-  if (scrub) {
-    function updateScrub(){
-      const r = scrub.parentElement.getBoundingClientRect();
-      const vh = window.innerHeight;
-      // Map scroll progress through the strip to translateX
-      const total = scrub.parentElement.offsetHeight + vh;
-      const scrolled = Math.min(Math.max(-r.top + vh * 0.5, 0), total);
-      const t = scrolled / total;
-      const x = -t * (scrub.scrollWidth / 2);
-      scrub.style.transform = `translateX(${x}px)`;
-      // Highlight words near the center
-      const spans = scrub.querySelectorAll('span');
-      const center = window.innerWidth / 2;
-      spans.forEach(s => {
-        const sr = s.getBoundingClientRect();
-        const dist = Math.abs((sr.left + sr.width/2) - center);
-        const opacity = Math.max(0.18, 1 - dist / 400);
-        s.style.opacity = Math.min(1, opacity);
-      });
-    }
-    window.addEventListener('scroll', updateScrub, { passive: true });
-    updateScrub();
-  }
+  /* 2. (Scrub marquee removed — too busy per user feedback) */
 
   /* 3. TESTIMONIAL AUTO-ROTATOR */
   const cards = document.querySelectorAll('.test-card');
@@ -1533,29 +1595,9 @@ section[id]{scroll-margin-top:80px}
 })();
 </script>
 
-<!-- Floating brain orb icon — bottom-right, persistent, pulsing -->
+<!-- Floating brain icon — bottom-right, persistent, real brain ref image -->
 <div class="float-brain" role="button" tabindex="0" aria-label="Scroll to top">
-  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <radialGradient id="brainGlow" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0%" stop-color="#fff" stop-opacity="0.95"/>
-        <stop offset="55%" stop-color="#C4B5FD" stop-opacity="0.7"/>
-        <stop offset="100%" stop-color="#A78BFA" stop-opacity="0.3"/>
-      </radialGradient>
-      <linearGradient id="brainFill" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#FBCFE8"/>
-        <stop offset="40%" stop-color="#C4B5FD"/>
-        <stop offset="100%" stop-color="#7C3AED"/>
-      </linearGradient>
-      <filter id="brainBlur"><feGaussianBlur stdDeviation="1.5"/></filter>
-    </defs>
-    <circle cx="50" cy="50" r="46" fill="url(#brainGlow)" opacity="0.5"/>
-    <circle cx="50" cy="50" r="38" fill="url(#brainFill)" filter="url(#brainBlur)"/>
-    <ellipse cx="38" cy="38" rx="14" ry="9" fill="#fff" opacity="0.45"/>
-    <path d="M 50 20 Q 45 35 50 50 T 50 80" stroke="#fff" stroke-width="0.7" fill="none" opacity="0.35"/>
-    <path d="M 30 50 Q 40 45 50 50 T 70 50" stroke="#fff" stroke-width="0.7" fill="none" opacity="0.35"/>
-    <circle cx="50" cy="50" r="42" stroke="#fff" stroke-width="1" fill="none" opacity="0.35"/>
-  </svg>
+  <img src="brain-reference.jpg" alt="" loading="lazy" width="88" height="88">
 </div>
 
 </body>
