@@ -575,6 +575,56 @@ img{max-width:100%;display:block}
 .hero-gradient,.aurora,.particles{z-index:1}
 
 /* ========================================================
+   FLOATING BRAIN ORB ICON — persistent bottom-right bubble.
+   Replaces the old hero orb as a passive decorative element.
+   ======================================================== */
+.float-brain{
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  width:64px;
+  height:64px;
+  z-index:90;
+  cursor:pointer;
+  transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  animation:float-brain-breathe 4.5s ease-in-out infinite, float-brain-float 6s ease-in-out infinite;
+}
+.float-brain:hover{transform:scale(1.1)}
+.float-brain svg{width:100%;height:100%;overflow:visible}
+@keyframes float-brain-breathe{
+  0%,100%{filter:drop-shadow(0 8px 24px rgba(167,139,250,0.45))}
+  50%{filter:drop-shadow(0 12px 36px rgba(167,139,250,0.7))}
+}
+@keyframes float-brain-float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-6px)}
+}
+.float-brain::after{
+  content:"Tap to return to top";
+  position:absolute;
+  right:74px;
+  top:50%;
+  transform:translateY(-50%);
+  background:#0B0B0C;
+  color:#fff;
+  font-size:12px;
+  font-weight:500;
+  padding:7px 12px;
+  border-radius:8px;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.2s ease, transform 0.2s ease;
+}
+.float-brain:hover::after{opacity:1;transform:translateY(-50%) translateX(-4px)}
+@media(max-width:560px){
+  .float-brain{width:52px;height:52px;bottom:80px;right:16px}
+  .float-brain::after{display:none}
+}
+.float-brain{transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease}
+.float-brain-hide{opacity:0;pointer-events:none;transform:translateY(20px)}
+
+/* ========================================================
    ORB HERO — DISABLED. Hero is now text-only per reference.
    CSS preserved here for future reuse if you want to bring
    the orb back as a separate visual element later.
@@ -1326,6 +1376,22 @@ section[id]{scroll-margin-top:80px}
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduced) return;
 
+  /* 0. FLOATING BRAIN ORB — click to scroll to top */
+  const brain = document.querySelector('.float-brain');
+  if (brain) {
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      // Hide when near top, show after scroll > 400
+      if (y < 400 && lastScroll > y) brain.classList.add('float-brain-hide');
+      else brain.classList.remove('float-brain-hide');
+      lastScroll = y;
+    }, { passive: true });
+    brain.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
   /* 1. HERO HEADLINE — split into chars for stagger reveal */
   const h1 = document.querySelector('.hero-h1');
   if (h1) {
@@ -1466,6 +1532,31 @@ section[id]{scroll-margin-top:80px}
   statNums.forEach(s => statIO.observe(s));
 })();
 </script>
+
+<!-- Floating brain orb icon — bottom-right, persistent, pulsing -->
+<div class="float-brain" role="button" tabindex="0" aria-label="Scroll to top">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <radialGradient id="brainGlow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0%" stop-color="#fff" stop-opacity="0.95"/>
+        <stop offset="55%" stop-color="#C4B5FD" stop-opacity="0.7"/>
+        <stop offset="100%" stop-color="#A78BFA" stop-opacity="0.3"/>
+      </radialGradient>
+      <linearGradient id="brainFill" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#FBCFE8"/>
+        <stop offset="40%" stop-color="#C4B5FD"/>
+        <stop offset="100%" stop-color="#7C3AED"/>
+      </linearGradient>
+      <filter id="brainBlur"><feGaussianBlur stdDeviation="1.5"/></filter>
+    </defs>
+    <circle cx="50" cy="50" r="46" fill="url(#brainGlow)" opacity="0.5"/>
+    <circle cx="50" cy="50" r="38" fill="url(#brainFill)" filter="url(#brainBlur)"/>
+    <ellipse cx="38" cy="38" rx="14" ry="9" fill="#fff" opacity="0.45"/>
+    <path d="M 50 20 Q 45 35 50 50 T 50 80" stroke="#fff" stroke-width="0.7" fill="none" opacity="0.35"/>
+    <path d="M 30 50 Q 40 45 50 50 T 70 50" stroke="#fff" stroke-width="0.7" fill="none" opacity="0.35"/>
+    <circle cx="50" cy="50" r="42" stroke="#fff" stroke-width="1" fill="none" opacity="0.35"/>
+  </svg>
+</div>
 
 </body>
 </html>
