@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Iridescent Brain · p5.js Demo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js"></script>
+<style>
+  html, body { margin: 0; padding: 0; overflow: hidden; background: #d9d9dc; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<script>
+// Iridescent translucent brain — metaball lobes with thin-film refraction shader
+// Strategy: render each lobe as a sphere, composite via alpha blending to fake
+// the soft metaball merging. Apply a fragment shader for the iridescent surface.
+
+const sketch = (p) => {
+  // 9 lobe positions roughly arranged in a brain shape
+  const lobes = [
+    // Front lobe (top-left)
+    { x: -110, y:  -90, z:  40, r:  90 },
+    // Front lobe (top-right)
+    { x:  110, y:  -90, z:  40, r:  95 },
+    // Mid lobe (center-left)
+    { x: -130, y:   20, z:  30, r: 100 },
+    // Mid lobe (center-right)
+    { x:  130, y:   20, z:  30, r: 105 },
+    // Back lobe (lower-left)
+    { x:  -80, y:  120, z: -20, r:  85 },
+    // Back lobe (lower-right)
+    { x:   90, y:  120, z: -20, r:  90 },
+    // Crown lobe (top-center)
+    { x:    0, y: -130, z:  20, r:  80 },
+    // Rear crown
+    { x:    0, y:  -40, z: -80, r:  85 },
+    // Brain stem — small one hanging below
+    { x:    0, y:  220, z:  20, r:  45 },
+    // Two small lobes for organic feel
+    { x:  -50, y: -150, z: -10, r:  55 },
+    { x:   55, y: -150, z: -10, r:  55 },
+  ];
+
+  let dragX = 0, dragY = 0;
+  let targetDragX = 0, targetDragY = 0;
+
+  p.setup = function() {
+    const c = p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
+    c.parent(document.body);
+    p.perspective(p.PI / 3, p.width / p.height, 1, 10000);
+  };
+
+  p.windowResized = function() { p.resizeCanvas(p.windowWidth, p.windowHeight); };
+
+  // Custom iridescent fragment shader — thin-film interference on normal-vector-driven hue
+  const fragShader = `
+    precision highp float;
+    varying vec3 vNormal;
+    varying vec3 vWorldPos;
+    uniform vec3 uCamPos;
+    uniform float uTime;
+    void main() {
+      vec3 N = normalize(vNormal);
+      vec3 V = normalize(uCamPos - vWorldPos);
+      float fres = pow(1.0 - max(dot(N, V), 0.0), 1.6);
+      // Thin-film hue shifts with viewing angle
+      float hue = fract(0.55 + uTime * 0.04 + dot(N, V) * 0.6 + fres * 0.25);
+      vec3 pink   = vec3(1.0, 0.72, 0.85);
+      vec3 lav    = vec3(0.78, 0.71, 1.0);
+      vec3 blue   = vec3(0.73, 0.85, 1.0);
+      vec3 peach  = vec3(1.0, 0.82, 0.75);
+      vec3 col = mix(pink, lav, smoothstep(0.0, 0.33, hue));
+      col = mix(col, blue, smoothstep(0.33, 0.66, hue));
+      col = mix(col, peach, smoothstep(0.66, 1.0, hue));
+      // Specular highlight
+      vec3 H = normalize(N + V);
+      float spec = pow(max(dot(N, H), 0.0), 32.0);
+      col += vec3(1.0, 0.95, 0.98) * spec * 0.45;
+      // Fresnel rim — pale white
+      col += vec3(0.95, 0.96, 1.0) * fres * 0.25;
+      // Translucency tint — pale inner color
+      col = mix(col, vec3(0.92, 0.90, 0.95), 0.15);
+      // Alpha: more transparent at center, opaque at edges (fresnel)
+      gl_FragColor = vec4(col, 0.85 + fres * 0.15);
+    }
+  `;
+
+  const vertShader = `
+    precision highp float;
+    attribute vec3 aNormal;
+    varying vec3 vNormal;
+    varying vec3 vWorldPos;
+    uniform mat4 uModelView;
+    void main() {
+      vNormal = normalize(normalMatrix * aNormal);
+      vec4 mvPos = uModelView * vec4(position, 1.0);
+      vWorldPos = mvPos.xyz;
+      gl_Position = projectionMatrix * mvPos;
+    }
+  `;
+
+  let brainShader;
+
+  p.setup = function() {
+    const c = p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
+    c.parent(document.body);
+    p.perspective(p.PI / 3, p.width / p.height, 1, 10000);
+    brainShader = p.createShader(vertShader, fragShader);
+  };
+
+  p.draw = function() {
+    p.background('#d9d9dc');
+
+    // Smooth drag toward target
+    dragX += (targetDragX - dragX) * 0.08;
+    dragY += (targetDragY - dragY) * 0.08;
+
+    // Camera setup
+    p.push();
+    p.translate(0, 0, 0);
+    p.rotateY(dragX);
+    p.rotateX(dragY + 0.15);
+
+    shader(brainShader);
+    brainShader.setUniform('uTime', p.millis() / 1000);
+    brainShader.setUniform('uCamPos', [0, 0, 600]);
+
+    // Draw lobes — slightly translucent for the metaball feel
+    for (const l of lobes) {
+      p.push();
+      p.translate(l.x, l.y, l.z);
+      p.sphere(l.r, 48, 48);
+      p.pop();
+    }
+
+    p.pop();
+  };
+
+  p.mouseDragged = function() {
+    targetDragX += (p.movedX * 0.005);
+    targetDragY += (p.movedY * 0.005);
+    targetDragY = p.constrain(targetDragY, -p.PI / 3, p.PI / 3);
+  };
+
+  // Touch support
+  p.touchMoved = function() {
+    if (p.touches.length === 1) {
+      targetDragX += (p.movedX * 0.005);
+      targetDragY += (p.movedY * 0.005);
+      targetDragY = p.constrain(targetDragY, -p.PI / 3, p.PI / 3);
+    }
+    return false;
+  };
+};
+
+new p5(sketch);
+</script>
+</body>
+</html>
