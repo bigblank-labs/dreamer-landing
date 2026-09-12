@@ -741,7 +741,7 @@ img{max-width:100%;display:block}
 
 
 /* ========================================================
-   3D BRAIN EMBED — p5.js WebGL iframe
+   3D BRAIN EMBED — p5.js WebGL inline
    ======================================================== */
 .brain-frame{
   position:relative;
@@ -750,16 +750,10 @@ img{max-width:100%;display:block}
   border-radius:32px;
   overflow:hidden;
   background:#d9d9dc;
+  cursor:grab;
 }
-.brain-frame iframe{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  border:0;
-  display:block;
-  pointer-events:auto;
-}
+.brain-frame:active{cursor:grabbing}
+.brain-frame canvas{display:block !important;width:100% !important;height:100% !important;position:relative !important}
 @media(max-width:860px){
   .brain-frame{height:400px;order:-1;margin-bottom:var(--s-6);border-radius:20px}
 }
@@ -1047,9 +1041,9 @@ section[id]{scroll-margin-top:80px}
       </div>
     </div>
 
-    <!-- 3D Iridescent Brain — p5.js WebGL (drag to rotate) -->
+    <!-- 3D Iridescent Brain — p5.js WebGL inline (drag to rotate) -->
     <div class="brain-frame" aria-label="Interactive 3D brain illustration — drag to rotate">
-      <iframe src="brain-demo.html" title="Iridescent translucent brain" loading="lazy" tabindex="-1"></iframe>
+      <div id="brainCanvas"></div>
     </div>
   </div>
 </section>
@@ -1698,6 +1692,126 @@ section[id]{scroll-margin-top:80px}
     });
   }, { threshold: 0.5 });
   statNums.forEach(s => statIO.observe(s));
+})();
+</script>
+
+<!-- 3D Iridescent Brain (inline p5.js WebGL) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js"></script>
+<script>
+(function(){
+  const container = document.getElementById('brainCanvas');
+  if (!container) return;
+
+  const sketch = (p) => {
+    const lobes = [
+      { x: -115, y: -85, z:  40, r:  92 },
+      { x:  115, y: -85, z:  40, r:  95 },
+      { x: -135, y:  25, z:  30, r: 100 },
+      { x:  135, y:  25, z:  30, r: 108 },
+      { x:  -85, y: 120, z: -25, r:  88 },
+      { x:   95, y: 120, z: -25, r:  92 },
+      { x:    0, y:-135, z:  15, r:  85 },
+      { x:    0, y: -45, z: -85, r:  88 },
+      { x:  -55, y:-155, z: -15, r:  58 },
+      { x:   55, y:-155, z: -15, r:  58 },
+    ];
+    const stem = [
+      { x: 0, y: 195, z: -45, r: 50 },
+      { x: 0, y: 260, z: -65, r: 35 },
+      { x: 0, y: 310, z: -85, r: 24 },
+    ];
+
+    let dragX = 0, dragY = -0.08, targetX = 0, targetY = -0.08;
+
+    p.setup = function() {
+      const c = container.querySelector('canvas') || container;
+      const w = container.offsetWidth || 500;
+      const h = container.offsetHeight || 500;
+      const cv = p.createCanvas(w, h, p.WEBGL);
+      cv.parent(container);
+      p.perspective(p.PI / 3.2, w / h, 1, 5000);
+      p.noStroke();
+    };
+    p.windowResized = function() {
+      const w = container.offsetWidth;
+      const h = container.offsetHeight;
+      if (w && h) p.resizeCanvas(w, h);
+    };
+
+    p.draw = function() {
+      dragX += (targetX - dragX) * 0.06;
+      dragY += (targetY - dragY) * 0.06;
+      const t = p.millis() / 1000;
+      const breath = Math.sin(t * 0.55) * 0.015;
+
+      p.background(217, 217, 220);
+
+      p.push();
+      p.rotateY(dragX);
+      p.rotateX(dragY);
+      p.scale(1 + breath);
+
+      p.ambientLight(190, 190, 210);
+      p.pointLight(255, 220, 235, -400, -300, 250);
+      p.pointLight(180, 220, 255,  400,  200, 200);
+      p.pointLight(255, 235, 195,    0, -500, 150);
+      p.pointLight(225, 200, 255,  -350,  400, 100);
+      p.pointLight(255, 255, 255,    0,    0, 700);
+
+      p.specularMaterial(255);
+      p.shininess(60);
+
+      p.fill(255, 230, 240, 200);
+      for (const l of lobes) {
+        p.push();
+        p.translate(l.x, l.y, l.z);
+        p.sphere(l.r, 32, 32);
+        p.pop();
+      }
+      p.fill(225, 220, 255, 200);
+      for (const s of stem) {
+        p.push();
+        p.translate(s.x, s.y, s.z);
+        p.sphere(s.r, 24, 24);
+        p.pop();
+      }
+      p.emissiveMaterial(255, 250, 255);
+      for (let i = 0; i < 3; i++) {
+        const l = lobes[i];
+        p.push();
+        p.translate(l.x * 0.55, l.y * 0.55 - 25, l.z + 55);
+        p.sphere(l.r * 0.16, 16, 16);
+        p.pop();
+      }
+      p.pop();
+    };
+
+    // Drag listeners on container
+    const onDown = (e) => { container.dataset.dragging = '1'; };
+    const onUp = () => { delete container.dataset.dragging; };
+    const onMove = (e) => {
+      if (!container.dataset.dragging) return;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      if (container.dataset.lastX) {
+        const dx = clientX - parseFloat(container.dataset.lastX);
+        const dy = clientY - parseFloat(container.dataset.lastY);
+        targetX += dx * 0.008;
+        targetY += dy * 0.008;
+        targetY = Math.max(-0.8, Math.min(0.8, targetY));
+      }
+      container.dataset.lastX = clientX;
+      container.dataset.lastY = clientY;
+    };
+    container.addEventListener('mousedown', onDown);
+    container.addEventListener('touchstart', onDown);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchend', onUp);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove);
+  };
+
+  new p5(sketch);
 })();
 </script>
 
