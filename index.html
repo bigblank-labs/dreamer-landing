@@ -635,60 +635,38 @@ img{max-width:100%;display:block}
 .phone-caption{font-size:13px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--c-muted);text-align:center;padding:var(--s-3) 0}
 
 /* ========================================================
-   FLOATING BRAIN ICON — bottom-right, pulsing, real brain ref.
+   APP SHOWCASE — 5-phone cloud cluster from reference image
    ======================================================== */
-.float-brain{
-  position:fixed;
-  bottom:24px;
-  right:24px;
-  width:88px;
-  height:88px;
-  z-index:90;
-  cursor:pointer;
-  border-radius:50%;
+.showcase-section{
+  position:relative;
+  padding:var(--s-9) 0;
   overflow:hidden;
-  background:#fff;
-  box-shadow:0 12px 36px rgba(167,139,250,0.45), 0 0 0 4px rgba(167,139,250,0.18);
-  transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease;
-  animation:float-brain-breathe 4.5s ease-in-out infinite, float-brain-float 6s ease-in-out infinite;
 }
-.float-brain:hover{
-  transform:scale(1.08);
-  box-shadow:0 16px 48px rgba(167,139,250,0.65), 0 0 0 6px rgba(167,139,250,0.25);
-}
-.float-brain img{width:100%;height:100%;object-fit:cover;display:block}
-@keyframes float-brain-breathe{
-  0%,100%{filter:brightness(1) saturate(1)}
-  50%{filter:brightness(1.1) saturate(1.15)}
-}
-@keyframes float-brain-float{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-8px)}
-}
-.float-brain::after{
-  content:"Tap to return to top";
+.showcase-bg{
   position:absolute;
-  right:98px;
-  top:50%;
-  transform:translateY(-50%);
-  background:#0B0B0C;
-  color:#fff;
-  font-size:12px;
-  font-weight:500;
-  padding:7px 12px;
-  border-radius:8px;
-  white-space:nowrap;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity 0.2s ease, transform 0.2s ease;
+  inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(196,181,253,0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 60% at 50% 100%, rgba(255,200,220,0.4) 0%, transparent 70%),
+    linear-gradient(180deg, #F4EEFF 0%, #FAFBFF 60%, #FFFFFF 100%);
+  z-index:0;
 }
-.float-brain:hover::after{opacity:1;transform:translateY(-50%) translateX(-4px)}
-@media(max-width:560px){
-  .float-brain{width:64px;height:64px;bottom:80px;right:16px}
-  .float-brain::after{display:none}
+.showcase-inner{position:relative;z-index:2;text-align:center;max-width:1100px;margin:0 auto;padding:0 var(--s-5)}
+.showcase-h{margin-left:auto;margin-right:auto;font-size:clamp(36px,4.5vw,56px);max-width:720px}
+.showcase-sub{margin-left:auto;margin-right:auto;max-width:620px;margin-bottom:var(--s-7)}
+.showcase-image-wrap{
+  position:relative;
+  max-width:1080px;
+  margin:0 auto;
+  border-radius:32px;
+  overflow:hidden;
+  box-shadow:0 40px 80px rgba(167,139,250,0.25), 0 12px 32px rgba(11,11,12,0.06);
 }
-.float-brain{transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease}
-.float-brain-hide{opacity:0;pointer-events:none;transform:translateY(20px)}
+.showcase-image-wrap img{display:block;width:100%;height:auto;background:transparent}
+@media(max-width:720px){
+  .showcase-section{padding:var(--s-7) 0}
+  .showcase-image-wrap{border-radius:20px}
+}
 
 /* ========================================================
    ORB HERO — DISABLED. Hero is now text-only per reference.
@@ -945,7 +923,20 @@ section[id]{scroll-margin-top:80px}
   </div>
 </section>
 
-<!-- 02 PHONE EXAMPLES — brand-matched UI states (lavender/violet gradient) -->
+<!-- 02 APP SHOWCASE — reference cluster: 5 phones floating in lavender cloud -->
+<section class="showcase-section" aria-label="App screens preview">
+  <div class="showcase-bg" aria-hidden="true"></div>
+  <div class="container showcase-inner">
+    <div class="kicker" style="justify-content:center">SEE THE WHOLE SYSTEM</div>
+    <h2 class="sec-head showcase-h">Capture. Structure. Understand.</h2>
+    <p class="sec-sub showcase-sub">Dreams, analysis, and your world — five screens, one calm app.</p>
+    <div class="showcase-image-wrap">
+      <img src="app-cluster-reference.jpg" alt="Five Dreamer app screens floating in a lavender cloud showing dreams, capture, analysis, and your world views" loading="lazy" width="1080" height="540">
+    </div>
+  </div>
+</section>
+
+<!-- 03 PHONE EXAMPLES — brand-matched UI states (lavender/violet gradient) -->
 <section class="phones-section" aria-labelledby="phones-h">
   <div class="container">
     <div class="phones-head">
@@ -1462,22 +1453,6 @@ section[id]{scroll-margin-top:80px}
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduced) return;
 
-  /* 0. FLOATING BRAIN ORB — click to scroll to top */
-  const brain = document.querySelector('.float-brain');
-  if (brain) {
-    let lastScroll = 0;
-    window.addEventListener('scroll', () => {
-      const y = window.scrollY;
-      // Hide when near top, show after scroll > 400
-      if (y < 400 && lastScroll > y) brain.classList.add('float-brain-hide');
-      else brain.classList.remove('float-brain-hide');
-      lastScroll = y;
-    }, { passive: true });
-    brain.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
   /* 1. HERO HEADLINE — split into chars for stagger reveal */
   const h1 = document.querySelector('.hero-h1');
   if (h1) {
@@ -1594,11 +1569,6 @@ section[id]{scroll-margin-top:80px}
   statNums.forEach(s => statIO.observe(s));
 })();
 </script>
-
-<!-- Floating brain icon — bottom-right, persistent, real brain ref image -->
-<div class="float-brain" role="button" tabindex="0" aria-label="Scroll to top">
-  <img src="brain-reference.jpg" alt="" loading="lazy" width="88" height="88">
-</div>
 
 </body>
 </html>
